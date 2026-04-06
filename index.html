@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบตรวจสอบรายชื่อผู้เข้าร่วมโครงการ</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Prompt', sans-serif; }
+    html, body { height: 100%; margin: 0; }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+    @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.3); } 50% { box-shadow: 0 0 40px rgba(212,175,55,0.6); } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    .animate-card-in { animation: cardIn 0.5s ease-out forwards; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+
+    .glass-card {
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212,175,55,0.3);
+    }
+
+    .gold-glow { animation: pulse-gold 2.5s ease-in-out infinite; }
+    .search-input:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212,175,55,0.2); }
+    .bg-cover-page { background-size: cover; background-position: center; background-repeat: no-repeat; }
+    .result-card { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,248,230,0.95)); border-left: 4px solid #d4af37; }
+
+    .lotus-divider { display: flex; align-items: center; gap: 12px; color: #d4af37; }
+    .lotus-divider::before, .lotus-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #d4af37, transparent); }
+
+    .btn-search { background: linear-gradient(135deg, #d4af37, #c5a028); color: #fff; transition: all 0.3s ease; }
+    .btn-search:hover { background: linear-gradient(135deg, #e0bc42, #d4af37); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
+    .btn-search:active { transform: translateY(0); }
+
+    .overlay-dark { background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.35) 100%); }
+    .spinner { border: 3px solid rgba(212,175,55,0.2); border-top-color: #d4af37; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="h-full overflow-auto">
+
+  <!-- PAGE: SEARCH -->
+  <div id="page-search" class="h-full w-full bg-cover-page relative" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--2.png');">
+    <div class="overlay-dark h-full w-full flex items-center justify-center p-4">
+      <div class="w-full max-w-lg text-center animate-fade-in-up">
+        <div class="mb-6 animate-float"><span class="text-5xl">🪷</span></div>
+        <h1 id="el-main-title" class="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-lg" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+          รายชื่อผู้เข้าร่วมโครงการ<br>ต้นกล้าบัณฑิตบวร
+        </h1>
+        <p id="el-sub-title" class="text-sm md:text-base text-yellow-100 mb-8 font-light drop-shadow" style="text-shadow: 0 1px 6px rgba(0,0,0,0.4);">
+          ทอดผ้าป่าเพื่อสนับสนุนการศึกษาให้กับโรงเรียนบางสะพานวิทยา
+        </p>
+        <div class="glass-card rounded-2xl p-6 md:p-8 gold-glow">
+          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณาพิมพ์ชื่อ หรือ นามสกุล เพื่อตรวจสอบ</p>
+          <form id="search-form" class="flex flex-col gap-3">
+            <div class="relative">
+              <input id="search-input" type="text" placeholder="พิมพ์ชื่อ หรือ นามสกุล..." class="search-input w-full px-5 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/80 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off">
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-500">
+                <i data-lucide="search" style="width:20px;height:20px;"></i>
+              </div>
+            </div>
+            <button type="submit" class="btn-search py-3 rounded-xl text-base font-semibold tracking-wide flex items-center justify-center gap-2"> 
+              <i data-lucide="search" style="width:18px;height:18px;"></i> ค้นหารายชื่อ 
+            </button>
+          </form>
+          <p class="text-gray-400 text-xs mt-4">ข้อมูลเชื่อมต่อจากระบบฐานข้อมูลกลาง</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: RESULTS -->
+  <div id="page-result" class="h-full w-full bg-cover-page relative hidden" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--3.png');">
+    <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-8 overflow-auto" style="min-height:100%;">
+      <div class="w-full max-w-lg">
+        <button id="btn-back" class="glass-card rounded-full px-4 py-2 text-sm font-medium text-gray-700 flex items-center gap-1.5 mb-6 hover:bg-white/90 transition-all animate-fade-in"> 
+          <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> กลับหน้าค้นหา 
+        </button>
+        <div id="result-container" class="animate-fade-in-up">
+          
+          <!-- Loading -->
+          <div id="result-loading" class="glass-card rounded-2xl p-10 text-center hidden">
+            <div class="flex justify-center mb-4"><div class="spinner"></div></div>
+            <p class="text-gray-600 font-medium">กำลังค้นหาข้อมูล...</p>
+          </div>
+          
+          <!-- Found -->
+          <div id="result-found" class="hidden">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-4"><span class="text-4xl mb-3 inline-block">✅</span>
+              <h2 class="text-xl font-bold text-gray-800 mb-1">พบรายชื่อผู้บริจาค</h2>
+              <p id="result-query-text" class="text-sm text-gray-500"></p>
+              <div class="lotus-divider mt-4"><span class="text-lg">🪷</span></div>
+            </div>
+            <div id="result-list" class="flex flex-col gap-3"></div>
+          </div>
+          
+          <!-- Not found -->
+          <div id="result-not-found" class="hidden">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center"><span class="text-4xl mb-3 inline-block">🙏</span>
+              <h2 id="el-not-found-msg" class="text-xl font-bold text-gray-800 mb-2">ไม่พบข้อมูลผู้บริจาค</h2>
+              <p class="text-gray-500 text-sm mb-5">หากไม่พบชื่อ กรุณาติดต่อเจ้าหน้าที่</p>
+              <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
+              <p class="text-gray-600 text-sm font-medium mb-3">สแกน QR Code เพื่อติดต่อ</p>
+              <img src="https://img1.pic.in.th/images/81897.jpg" alt="QR Code ติดต่อเจ้าหน้าที่" class="mx-auto rounded-xl shadow-lg w-48 h-48 object-contain bg-white p-2">
+            </div>
+          </div>
+          
+          <!-- Error -->
+          <div id="result-error" class="hidden">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center"><span class="text-4xl mb-3 inline-block">⚠️</span>
+              <h2 class="text-xl font-bold text-gray-800 mb-2">เกิดข้อผิดพลาด</h2>
+              <p class="text-gray-500 text-sm mb-4">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
+              <button id="btn-retry" class="btn-search px-6 py-2.5 rounded-xl text-sm font-semibold">ลองใหม่</button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Icons
+    lucide.createIcons();
+
+    // Google Sheets data fetch
+    const SHEET_ID = '1TYAkb_ik3kns2dkVfoyOJCBYMacaJzzFW_V3A48QMzs';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    let cachedNames = null;
+
+    async function fetchNames() {
+      if (cachedNames) return cachedNames;
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
+      if (!jsonStr) throw new Error('Parse error');
+      const data = JSON.parse(jsonStr[1]);
+      const rows = data.table.rows;
+      const cols = data.table.cols;
+
+      let nameColIdx = -1;
+      for (let i = 0; i < cols.length; i++) {
+        if (cols[i].label && cols[i].label.includes('ชื่อ-สกุล')) { nameColIdx = i; break; }
+      }
+      if (nameColIdx === -1 && rows.length > 0) {
+        for (let i = 0; i < (rows[0].c || []).length; i++) {
+          const cell = rows[0].c[i];
+          if (cell && cell.v && String(cell.v).includes('ชื่อ-สกุล')) { nameColIdx = i; break; }
+        }
+      }
+      if (nameColIdx === -1) nameColIdx = 0;
+
+      const names = [];
+      for (const row of rows) {
+        if (row.c && row.c[nameColIdx]) {
+          const val = row.c[nameColIdx].v;
+          if (val && typeof val === 'string') {
+            const trimmed = val.trim();
+            if (trimmed && !trimmed.includes('ชื่อ-สกุล')) { names.push(trimmed); }
+          }
+        }
+      }
+      cachedNames = names;
+      return names;
+    }
+
+    // Navigation
+    const pageSearch = document.getElementById('page-search');
+    const pageResult = document.getElementById('page-result');
+
+    function showPage(page) {
+      pageSearch.classList.toggle('hidden', page !== 'search');
+      pageResult.classList.toggle('hidden', page !== 'result');
+    }
+
+    // Search
+    let lastQuery = '';
+
+    async function doSearch(query) {
+      lastQuery = query.trim();
+      if (!lastQuery) return;
+
+      showPage('result');
+
+      const loading = document.getElementById('result-loading');
+      const found = document.getElementById('result-found');
+      const notFound = document.getElementById('result-not-found');
+      const errorEl = document.getElementById('result-error');
+
+      loading.classList.remove('hidden');
+      found.classList.add('hidden');
+      notFound.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      try {
+        const names = await fetchNames();
+        const results = names.filter(n => n.toLowerCase().includes(lastQuery.toLowerCase()));
+
+        loading.classList.add('hidden');
+
+        if (results.length > 0) {
+          found.classList.remove('hidden');
+          document.getElementById('result-query-text').textContent = `ค้นหา "${lastQuery}" — พบ ${results.length} รายการ`;
+
+          const list = document.getElementById('result-list');
+          list.innerHTML = '';
+          results.forEach((name, i) => {
+            const card = document.createElement('div');
+            card.className = 'result-card rounded-xl px-5 py-4 shadow-md animate-card-in flex items-center gap-3';
+            card.style.animationDelay = `${i * 0.08}s`;
+            card.style.opacity = '0';
+            card.style.animationFillMode = 'forwards';
+            card.innerHTML = `
+              <span class="text-yellow-500 font-bold text-lg">${i + 1}.</span>
+              <span class="text-gray-800 font-medium">${escapeHtml(name)}</span>
+            `;
+            list.appendChild(card);
+          });
+        } else {
+          notFound.classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error('Fetch error:', e);
+        loading.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+    }
+
+    // Events
+    document.getElementById('search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      doSearch(document.getElementById('search-input').value);
+    });
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      showPage('search');
+    });
+
+    document.getElementById('btn-retry').addEventListener('click', () => {
+      if (lastQuery) doSearch(lastQuery);
+    });
+
+    // Init
+    showPage('search');
+    fetchNames().catch(() => {});
+  </script>
+</body>
+</html>
