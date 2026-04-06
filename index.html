@@ -15,12 +15,12 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.3); } 50% { box-shadow: 0 0 40px rgba(212,175,55,0.6); } }
     @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } } /* ขยับแอนิเมชันให้ลอยสูงขึ้นนิดนึงเข้ากับโลโก้ใหญ่ */
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
     .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     .animate-card-in { animation: cardIn 0.5s ease-out forwards; }
-    .animate-float { animation: float 3.5s ease-in-out infinite; } /* ปรับให้ลอยนุ่มขึ้น */
+    .animate-float { animation: float 3.5s ease-in-out infinite; }
 
     .glass-card {
       background: rgba(255,255,255,0.75);
@@ -62,7 +62,6 @@
     <div class="overlay-dark h-full w-full flex items-center justify-center p-4">
       <div class="w-full max-w-lg text-center animate-fade-in-up">
         
-        <!-- โลโก้ปรับขนาดใหญ่ขึ้นตรงนี้ (เปลี่ยนคลาสจาก w-32 md:w-40 เป็น w-48 md:w-64) -->
         <div class="mb-5 animate-float">
           <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-48 md:w-64 h-auto mx-auto" style="filter: drop-shadow(0 8px 16px rgba(0,0,0,0.45));">
         </div>
@@ -74,7 +73,7 @@
           ทอดผ้าป่าเพื่อสนับสนุนการศึกษาให้กับโรงเรียนบางสะพานวิทยา
         </p>
         <div class="glass-card rounded-2xl p-6 md:p-8 gold-glow">
-          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอก <span class="text-red-600">ชื่อ</span> และ <span class="text-red-600">นามสกุล</span> ให้ครบถ้วนเพื่อตรวจสอบ</p>
+          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอก <span class="text-red-600">ชื่อ</span> และ <span class="text-red-600">นามสกุล</span> ให้ครบและถูกต้องเพื่อตรวจสอบ</p>
           
           <form id="search-form" class="flex flex-col gap-4" novalidate>
             
@@ -228,8 +227,11 @@
         const results = records.filter(person => {
           const normDbFname = normalizeString(person.firstName);
           const normDbLname = normalizeString(person.lastName);
-          const matchFirst = normDbFname.includes(normSearchFname);
-          const matchLast = normDbLname.includes(normSearchLname);
+          
+          // ตรวจสอบแบบตรงเป๊ะ (Exact Match) แทนการใช้ .includes()
+          const matchFirst = normDbFname === normSearchFname;
+          const matchLast = normDbLname === normSearchLname;
+          
           return matchFirst && matchLast;
         });
 
