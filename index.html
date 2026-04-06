@@ -130,29 +130,30 @@
   <!-- PAGE: RESULTS -->
   <div id="page-result" class="h-full w-full bg-cover-page relative hidden" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--2.png');">
     <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-8 overflow-auto" style="min-height:100%;">
-      <div class="w-full max-w-lg">
-        <button id="btn-back" class="glass-card rounded-full px-4 py-2 text-sm font-medium text-gray-700 flex items-center gap-1.5 mb-6 hover:bg-white/90 transition-all animate-fade-in cursor-pointer"> 
+      <!-- เปลี่ยนคอนเทนเนอร์ให้กว้างขึ้นเป็น max-w-xl เพื่อให้มีพื้นที่สำหรับชื่อที่ยาวขึ้น -->
+      <div class="w-full max-w-xl">
+        <button id="btn-back" class="glass-card rounded-full px-4 py-2 text-sm font-medium text-gray-700 flex items-center gap-1.5 mb-6 hover:bg-white/90 transition-all animate-fade-in cursor-pointer max-w-fit"> 
           <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> กลับหน้าค้นหา 
         </button>
         <div id="result-container" class="animate-fade-in-up">
           
-          <div id="result-loading" class="glass-card rounded-2xl p-10 text-center hidden">
+          <div id="result-loading" class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto hidden">
             <div class="flex justify-center mb-4"><div class="spinner"></div></div>
             <p class="text-gray-600 font-medium">กำลังตรวจสอบข้อมูล...</p>
           </div>
           
           <div id="result-found" class="hidden">
-            <!-- กรอบหัวข้อ -->
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-6">
+            <!-- กรอบหัวข้อ (บีบความกว้างให้เล็กกว่าชื่อ) -->
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-6 max-w-[85%] md:max-w-md mx-auto">
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</span></h2>
               <div class="lotus-divider mt-5"><span class="text-lg">🪷</span></div>
             </div>
             
-            <!-- กรอบแสดงชื่อ (จะถูกเพิ่มด้วย JavaScript) -->
-            <div id="result-list" class="flex flex-col gap-4 mb-6"></div>
+            <!-- กรอบแสดงชื่อ (ปล่อยเต็มความกว้าง กว้างที่สุดในหน้าจอ) -->
+            <div id="result-list" class="flex flex-col gap-4 mb-6 w-full"></div>
 
-            <!-- กรอบข้อความแยกต่างหาก (แสดงผลด้านล่างสุด) -->
-            <div class="glass-card rounded-xl p-5 md:p-6 text-center animate-fade-in-up" style="animation-delay: 0.3s; animation-fill-mode: both; background: rgba(255,255,255,0.85);">
+            <!-- กรอบข้อความแยกต่างหาก (บีบความกว้างให้เล็กกว่าชื่อ) -->
+            <div class="glass-card rounded-xl p-5 md:p-6 text-center animate-fade-in-up max-w-[85%] md:max-w-md mx-auto" style="animation-delay: 0.3s; animation-fill-mode: both; background: rgba(255,255,255,0.85);">
               <p class="text-gray-700 font-medium text-[15px] md:text-base leading-relaxed">
                 จากราก…สู่ลำต้น จากลำต้น…สู่ดอกบาน
               </p>
@@ -163,7 +164,7 @@
           </div>
           
           <div id="result-not-found" class="hidden">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">ไม่พบรายชื่อในระบบ</h2>
               <p class="text-gray-500 text-sm mb-6">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
               <div class="lotus-divider mb-6"><span class="text-lg">🪷</span></div>
@@ -173,7 +174,7 @@
           </div>
           
           <div id="result-error" class="hidden">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
               <h2 class="text-xl font-bold text-gray-800 mb-2">ระบบขัดข้องชั่วคราว</h2>
               <p class="text-gray-500 text-sm mb-5">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
               <button id="btn-retry" class="btn-search px-6 py-2.5 rounded-xl text-sm font-semibold mx-auto">ลองใหม่</button>
@@ -280,13 +281,12 @@
           list.innerHTML = '';
           results.forEach((person, i) => {
             const card = document.createElement('div');
-            // เพิ่มความสูง Padding (py-8 md:py-10) เพื่อให้กรอบชื่อใหญ่และเด่นที่สุด
-            card.className = 'honor-card rounded-xl px-4 py-8 md:py-10 text-center animate-card-in';
+            // ป้ายชื่อจะเต็มความกว้าง w-full เสมอ
+            card.className = 'w-full honor-card rounded-xl px-4 py-8 md:py-10 text-center animate-card-in';
             card.style.animationDelay = `${i * 0.08}s`;
             card.style.opacity = '0';
             card.style.animationFillMode = 'forwards';
             
-            // แสดงเฉพาะชื่อในกรอบนี้ และขยายขนาดตัวอักษรให้ใหญ่ขึ้น (text-3xl md:text-4xl)
             card.innerHTML = `
               <div class="relative z-10 flex flex-col items-center justify-center">
                 <h3 class="text-3xl md:text-4xl font-bold text-gold-gradient tracking-wide">
