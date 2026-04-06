@@ -69,7 +69,7 @@
           ทอดผ้าป่าเพื่อสนับสนุนการศึกษาให้กับโรงเรียนบางสะพานวิทยา
         </p>
         <div class="glass-card rounded-2xl p-6 md:p-8 gold-glow">
-          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอกชื่อ หรือ นามสกุล เพื่อตรวจสอบ</p>
+          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอก <span class="text-red-600">ชื่อ</span> และ <span class="text-red-600">นามสกุล</span> ให้ครบถ้วนเพื่อตรวจสอบ</p>
           <form id="search-form" class="flex flex-col gap-4">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -77,7 +77,8 @@
                 <input id="search-firstname" type="text" placeholder="ชื่อ" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off" required>
               </div>
               <div class="relative">
-                <input id="search-lastname" type="text" placeholder="นามสกุล (ถ้ามี)" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off">
+                <!-- เพิ่ม required เพื่อบังคับกรอกนามสกุล -->
+                <input id="search-lastname" type="text" placeholder="นามสกุล" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off" required>
               </div>
             </div>
 
@@ -218,10 +219,11 @@
     let lastLastName = '';
 
     async function doSearch(searchFname, searchLname) {
-      lastFirstName = searchFname;
-      lastLastName = searchLname;
+      lastFirstName = searchFname.trim();
+      lastLastName = searchLname.trim();
       
-      if (!lastFirstName) return;
+      // ป้องกันการค้นหาหากกรอกไม่ครบทั้งสองช่อง
+      if (!lastFirstName || !lastLastName) return;
 
       showPage('result');
 
@@ -239,8 +241,8 @@
         const records = await fetchNames();
         
         // ทำให้คำที่ใช้ค้นหาไม่มีเว้นวรรค
-        const normSearchFname = normalizeString(searchFname);
-        const normSearchLname = normalizeString(searchLname);
+        const normSearchFname = normalizeString(lastFirstName);
+        const normSearchLname = normalizeString(lastLastName);
 
         const results = records.filter(person => {
           // ทำให้ชื่อในฐานข้อมูลไม่มีเว้นวรรค
@@ -248,10 +250,10 @@
           const normDbLname = normalizeString(person.lastName);
           
           // เช็คชื่อ: ต้องมีตัวอักษรตรงกับช่อง C
-          const matchFirst = normSearchFname === '' || normDbFname.includes(normSearchFname);
+          const matchFirst = normDbFname.includes(normSearchFname);
           
-          // เช็คนามสกุล: ต้องมีตัวอักษรตรงกับช่อง D (ถ้าไม่ได้กรอกนามสกุลมา จะถือว่าผ่านทันที)
-          const matchLast = normSearchLname === '' || normDbLname.includes(normSearchLname);
+          // เช็คนามสกุล: ต้องมีตัวอักษรตรงกับช่อง D
+          const matchLast = normDbLname.includes(normSearchLname);
           
           return matchFirst && matchLast;
         });
@@ -270,7 +272,7 @@
             card.style.opacity = '0';
             card.style.animationFillMode = 'forwards';
             
-            // แสดงชื่อ-นามสกุล เต็มรูปแบบจากฐานข้อมูล (แสดงแบบมีเว้นวรรคปกติสวยงาม)
+            // แสดงชื่อ-นามสกุล เต็มรูปแบบจากฐานข้อมูล
             card.innerHTML = `<span class="text-gray-800 font-bold text-xl md:text-2xl tracking-wide">${escapeHtml(person.fullName)}</span>`;
             list.appendChild(card);
           });
