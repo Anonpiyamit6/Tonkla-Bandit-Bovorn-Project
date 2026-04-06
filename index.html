@@ -33,7 +33,6 @@
     .search-input:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212,175,55,0.2); }
     .bg-cover-page { background-size: cover; background-position: center; background-repeat: no-repeat; }
     
-    /* สไตล์ป้ายชื่อแบบใหม่ */
     .nameplate-card { 
       background: linear-gradient(135deg, #ffffff, #fffdf5); 
       border: 1px solid #e5d07a;
@@ -70,7 +69,7 @@
           ทอดผ้าป่าเพื่อสนับสนุนการศึกษาให้กับโรงเรียนบางสะพานวิทยา
         </p>
         <div class="glass-card rounded-2xl p-6 md:p-8 gold-glow">
-          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอกชื่อ และ นามสกุล เพื่อตรวจสอบ</p>
+          <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอกชื่อ หรือ นามสกุล เพื่อตรวจสอบ</p>
           <form id="search-form" class="flex flex-col gap-4">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -78,7 +77,7 @@
                 <input id="search-firstname" type="text" placeholder="ชื่อ" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off" required>
               </div>
               <div class="relative">
-                <input id="search-lastname" type="text" placeholder="นามสกุล" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off">
+                <input id="search-lastname" type="text" placeholder="นามสกุล (ถ้ามี)" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off">
               </div>
             </div>
 
@@ -149,6 +148,12 @@
 
     let cachedRecords = null;
 
+    // ฟังก์ชันสำหรับเคลียร์ช่องว่างทั้งหมดออกเพื่อให้ค้นหาเจอง่ายขึ้น
+    function normalizeString(str) {
+      if (!str) return '';
+      return str.toString().toLowerCase().replace(/\s+/g, '');
+    }
+
     async function fetchNames() {
       if (cachedRecords) return cachedRecords;
       
@@ -162,53 +167,33 @@
       const rows = data.table.rows;
       
       const records = [];
-      let fNameColIdx = -1;
-      let lNameColIdx = -1;
-      let startRowIdx = -1;
+      
+      // อิงจากตารางที่คุณส่งมา ชื่ออยู่คอลัมน์ C (Index 2) และ สกุลอยู่คอลัมน์ D (Index 3)
+      const fNameColIdx = 2; 
+      const lNameColIdx = 3; 
 
-      // สแกนหาคอลัมน์ "ชื่อ" และ "สกุล"
-      for (let r = 0; r < rows.length; r++) {
-        const rowData = rows[r].c;
-        if (!rowData) continue;
-        for (let c = 0; c < rowData.length; c++) {
-          const cell = rowData[c];
-          if (cell && cell.v && typeof cell.v === 'string') {
-            const cellText = cell.v.trim();
-            if (cellText === 'ชื่อ') {
-              fNameColIdx = c;
-            } else if (cellText === 'สกุล' || cellText === 'นามสกุล') {
-              lNameColIdx = c;
-            }
-          }
-        }
-        // ถ้าเจอช่องใดช่องหนึ่ง ให้ถือว่าแถวถัดไปคือข้อมูล
-        if (fNameColIdx !== -1 || lNameColIdx !== -1) {
-          startRowIdx = r + 1;
-          break;
-        }
-      }
-
-      // ค่าเริ่มต้น หากหาหัวตารางไม่เจอ ให้ถือว่า ชื่ออยู่ช่อง C(2) และ สกุลอยู่ช่อง D(3)
-      if (fNameColIdx === -1) fNameColIdx = 2; 
-      if (lNameColIdx === -1) lNameColIdx = 3; 
-      if (startRowIdx === -1) startRowIdx = 3; // ข้อมูลเริ่มที่แถว 4
-
-      // ดึงข้อมูลชื่อและนามสกุลมาเก็บเป็น Object
-      for (let r = startRowIdx; r < rows.length; r++) {
+      // เริ่มดึงข้อมูลตั้งแต่แถวที่มีข้อมูล (ข้ามพวกหัวตาราง)
+      for (let r = 2; r < rows.length; r++) {
         const rowData = rows[r].c;
         if (!rowData) continue;
 
         let fName = '';
         let lName = '';
 
-        if (rowData[fNameColIdx] && typeof rowData[fNameColIdx].v === 'string') {
-          fName = rowData[fNameColIdx].v.trim();
+        // ดึงชื่อ (คอลัมน์ C)
+        if (rowData.length > fNameColIdx && rowData[fNameColIdx] && rowData[fNameColIdx].v) {
+          fName = String(rowData[fNameColIdx].v).trim();
         }
-        if (rowData[lNameColIdx] && typeof rowData[lNameColIdx].v === 'string') {
-          lName = rowData[lNameColIdx].v.trim();
+        
+        // ดึงสกุล (คอลัมน์ D)
+        if (rowData.length > lNameColIdx && rowData[lNameColIdx] && rowData[lNameColIdx].v) {
+          lName = String(rowData[lNameColIdx].v).trim();
         }
 
-        // ถ้ามีชื่อหรือนามสกุลอย่างใดอย่างหนึ่ง ให้เก็บลงระบบ
+        // ยกเว้นคำว่า "ชื่อ" หรือ "สกุล" ที่เป็นหัวตาราง
+        if (fName === 'ชื่อ' || lName === 'สกุล') continue;
+
+        // ถ้ามีข้อมูลชื่อหรือนามสกุล ให้เก็บเข้าสู่ระบบ
         if (fName !== '' || lName !== '') {
           records.push({
             firstName: fName,
@@ -232,11 +217,11 @@
     let lastFirstName = '';
     let lastLastName = '';
 
-    async function doSearch(firstName, lastName) {
-      lastFirstName = firstName.trim().toLowerCase();
-      lastLastName = lastName.trim().toLowerCase();
+    async function doSearch(searchFname, searchLname) {
+      lastFirstName = searchFname;
+      lastLastName = searchLname;
       
-      if (!lastFirstName && !lastLastName) return;
+      if (!lastFirstName) return;
 
       showPage('result');
 
@@ -253,13 +238,20 @@
       try {
         const records = await fetchNames();
         
-        // ค้นหาโดยแยกเงื่อนไข ชื่อ ค้นในคอลัมน์ชื่อ, สกุล ค้นในคอลัมน์สกุล
+        // ทำให้คำที่ใช้ค้นหาไม่มีเว้นวรรค
+        const normSearchFname = normalizeString(searchFname);
+        const normSearchLname = normalizeString(searchLname);
+
         const results = records.filter(person => {
-          const pFName = person.firstName.toLowerCase();
-          const pLName = person.lastName.toLowerCase();
+          // ทำให้ชื่อในฐานข้อมูลไม่มีเว้นวรรค
+          const normDbFname = normalizeString(person.firstName);
+          const normDbLname = normalizeString(person.lastName);
           
-          const matchFirst = lastFirstName === '' || pFName.includes(lastFirstName);
-          const matchLast = lastLastName === '' || pLName.includes(lastLastName);
+          // เช็คชื่อ: ต้องมีตัวอักษรตรงกับช่อง C
+          const matchFirst = normSearchFname === '' || normDbFname.includes(normSearchFname);
+          
+          // เช็คนามสกุล: ต้องมีตัวอักษรตรงกับช่อง D (ถ้าไม่ได้กรอกนามสกุลมา จะถือว่าผ่านทันที)
+          const matchLast = normSearchLname === '' || normDbLname.includes(normSearchLname);
           
           return matchFirst && matchLast;
         });
@@ -278,6 +270,7 @@
             card.style.opacity = '0';
             card.style.animationFillMode = 'forwards';
             
+            // แสดงชื่อ-นามสกุล เต็มรูปแบบจากฐานข้อมูล (แสดงแบบมีเว้นวรรคปกติสวยงาม)
             card.innerHTML = `<span class="text-gray-800 font-bold text-xl md:text-2xl tracking-wide">${escapeHtml(person.fullName)}</span>`;
             list.appendChild(card);
           });
