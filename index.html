@@ -99,8 +99,9 @@
           
           <!-- Found -->
           <div id="result-found" class="hidden">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-4"><span class="text-4xl mb-3 inline-block">✅</span>
-              <h2 class="text-xl font-bold text-gray-800 mb-1">พบรายชื่อผู้บริจาค</h2>
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-4">
+              <span class="text-4xl mb-3 inline-block">✅</span>
+              <h2 class="text-xl font-bold text-gray-800 mb-1">ท่านมีรายชื่อผู้เข้าร่วมโครงการ "ต้นกล้าบัณฑิตบวร"</h2>
               <p id="result-query-text" class="text-sm text-gray-500"></p>
               <div class="lotus-divider mt-4"><span class="text-lg">🪷</span></div>
             </div>
@@ -110,7 +111,7 @@
           <!-- Not found -->
           <div id="result-not-found" class="hidden">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center"><span class="text-4xl mb-3 inline-block">🙏</span>
-              <h2 class="text-xl font-bold text-gray-800 mb-2">ไม่พบข้อมูลผู้บริจาค</h2>
+              <h2 id="el-not-found-msg" class="text-xl font-bold text-gray-800 mb-2">ไม่พบข้อมูลผู้บริจาค</h2>
               <p class="text-gray-500 text-sm mb-5">หากไม่พบชื่อ กรุณาติดต่อเจ้าหน้าที่</p>
               <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
               <p class="text-gray-600 text-sm font-medium mb-3">สแกน QR Code เพื่อติดต่อ</p>
@@ -240,7 +241,12 @@
 
         if (results.length > 0) {
           found.classList.remove('hidden');
-          document.getElementById('result-query-text').textContent = `ค้นหา "${lastQuery}" — พบ ${results.length} รายการ`;
+          // เปลี่ยนข้อความตรงนี้
+          document.getElementById('result-query-text').textContent = '';
+          const foundHeading = document.querySelector('#result-found h2');
+          if (foundHeading) {
+            foundHeading.textContent = 'ท่านมีรายชื่อผู้เข้าร่วมโครงการ "ต้นกล้าบัณฑิตบวร"';
+          }
 
           const list = document.getElementById('result-list');
           list.innerHTML = '';
