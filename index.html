@@ -39,22 +39,36 @@
 
     .bg-cover-page { background-size: cover; background-position: center; background-repeat: no-repeat; }
     
-    /* สไตล์ป้ายชื่อที่ดูสวยงามและเชิดชูเกียรติ */
+    /* สไตล์กรอบใหญ่ (ใบประกาศ) */
     .honor-card { 
       background: linear-gradient(135deg, #ffffff 0%, #fffdf0 50%, #fdf9e3 100%); 
       border: 2px solid #d4af37;
       box-shadow: 0 10px 30px rgba(212,175,55,0.25), inset 0 0 20px rgba(212,175,55,0.1);
       position: relative;
     }
-    
-    /* เส้นกรอบด้านในแบบไทยประยุกต์ */
     .honor-card::before {
       content: '';
       position: absolute;
-      top: 6px; left: 6px; right: 6px; bottom: 6px;
-      border: 1px solid rgba(212,175,55,0.5);
-      border-radius: 6px;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1px solid rgba(212,175,55,0.4);
+      border-radius: 8px;
       pointer-events: none;
+    }
+
+    /* สไตล์กรอบย่อยด้านใน สำหรับเน้นชื่อ */
+    .inner-name-box {
+      background: #ffffff;
+      border: 1px solid rgba(212,175,55,0.4);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03), inset 0 0 15px rgba(212,175,55,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .inner-name-box::after {
+       content: '';
+       position: absolute;
+       top: 0; left: 0; right: 0; height: 3px;
+       background: linear-gradient(90deg, transparent, #d4af37, transparent);
     }
 
     /* ตัวอักษรชื่อสีทองสะท้อนแสง */
@@ -69,6 +83,7 @@
       text-shadow: 0px 2px 4px rgba(0,0,0,0.1);
     }
 
+    /* เส้นคั่นดอกบัว */
     .lotus-divider { display: flex; align-items: center; gap: 12px; color: #d4af37; }
     .lotus-divider::before, .lotus-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #d4af37, transparent); }
 
@@ -141,53 +156,59 @@
           </button>
         </div>
 
-        <!-- คอนเทนเนอร์หลักของผลลัพธ์ -->
-        <div id="result-container" class="animate-fade-in-up w-full">
+        <div id="result-container" class="w-full">
           
-          <div id="result-loading" class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto hidden">
+          <div id="result-loading" class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto hidden animate-fade-in-up">
             <div class="flex justify-center mb-4"><div class="spinner"></div></div>
             <p class="text-gray-600 font-medium">กำลังตรวจสอบข้อมูล...</p>
           </div>
           
+          <!-- หน้าแสดงผลเมื่อค้นพบรายชื่อ -->
           <div id="result-found" class="hidden w-full">
-            <!-- 1. กรอบหัวข้อ + โลโก้ (บีบความกว้างให้เล็กกว่าชื่อ) -->
-            <div class="glass-card rounded-2xl p-5 md:p-6 text-center mb-3.5 max-w-[85%] md:max-w-sm mx-auto">
-              <!-- โลโก้ถูกย้ายมาอยู่ในกรอบ ปรับขนาดให้กะทัดรัด -->
-              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-20 md:w-24 h-auto mx-auto mb-3 animate-float" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+            <!-- กรอบใหญ่กรอบเดียว (Honor Card) -->
+            <div class="honor-card rounded-2xl p-6 md:p-10 text-center w-full mx-auto animate-card-in">
               
-              <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-1 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ</h2>
+              <!-- 1. โลโก้และหัวข้อ -->
+              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-20 md:w-24 h-auto mx-auto mb-4 animate-float" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));">
+              <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-1">ท่านมีรายชื่อผู้เข้าร่วมโครงการ</h2>
               <h3 class="text-xl md:text-2xl font-bold text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</h3>
-            </div>
-            
-            <!-- 2. กรอบแสดงชื่อ (ปล่อยเต็มความกว้าง กว้างที่สุดในหน้าจอ) -->
-            <div id="result-list" class="flex flex-col gap-4 mb-3.5 w-full"></div>
-
-            <!-- 3. กรอบข้อความแยกต่างหาก (บีบความกว้าง ขยับขึ้นมาชิดกับกรอบชื่อ) -->
-            <div class="glass-card rounded-xl p-4 md:p-5 text-center animate-fade-in-up max-w-[85%] md:max-w-sm mx-auto" style="animation-delay: 0.3s; animation-fill-mode: both;">
-              <p class="text-gray-700 font-medium text-[14px] md:text-[15px] leading-relaxed">
-                จากราก…สู่ลำต้น จากลำต้น…สู่ดอกบาน
-              </p>
-              <p class="text-yellow-700 font-semibold text-[14px] md:text-[15px] leading-relaxed mt-0.5">
-                ท่านคือส่วนหนึ่งของทุกการเติบโตของราชพฤกษ์นี้
-              </p>
-            </div>
-          </div>
-          
-          <div id="result-not-found" class="hidden w-full">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-md mx-auto">
-              <!-- เพิ่มโลโก้ในหน้า ไม่พบรายชื่อ เพื่อความสมดุล -->
-              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-20 md:w-24 h-auto mx-auto mb-4 opacity-90" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));">
               
-              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">ไม่พบรายชื่อในระบบ</h2>
-              <p class="text-gray-500 text-sm mb-5">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
-              <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
-              <p class="text-gray-600 text-sm font-medium mb-3">ช่องทางการติดต่อเจ้าหน้าที่</p>
-              <img src="https://img1.pic.in.th/images/81897.jpg" alt="QR Code ติดต่อเจ้าหน้าที่" class="mx-auto rounded-xl shadow-md w-40 h-40 object-contain bg-white p-2 border border-gray-100">
+              <!-- 2. พื้นที่แสดงกรอบชื่อ (Javascript จะนำ inner-name-box มาใส่ที่นี่) -->
+              <div id="result-list" class="w-full my-6"></div>
+
+              <!-- 3. เส้นคั่นดอกบัว 🪷 -->
+              <div class="lotus-divider mb-5"><span class="text-xl">🪷</span></div>
+
+              <!-- 4. ข้อความความหมายดีๆ ด้านล่างสุด -->
+              <div class="px-2">
+                <p class="text-gray-700 font-medium text-[14px] md:text-[15px] leading-relaxed">
+                  จากราก…สู่ลำต้น จากลำต้น…สู่ดอกบาน
+                </p>
+                <p class="text-yellow-700 font-semibold text-[14px] md:text-[15px] leading-relaxed mt-0.5">
+                  ท่านคือส่วนหนึ่งของทุกการเติบโตของราชพฤกษ์นี้
+                </p>
+              </div>
+
             </div>
           </div>
           
-          <div id="result-error" class="hidden w-full">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-md mx-auto">
+          <!-- หน้าแสดงผลเมื่อไม่พบรายชื่อ (ปรับขนาดให้เล็กและบาลานซ์ขึ้น) -->
+          <div id="result-not-found" class="hidden w-full animate-fade-in-up">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-sm mx-auto">
+              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-16 md:w-20 h-auto mx-auto mb-4 opacity-90" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+              
+              <h2 class="text-xl font-bold text-gray-800 mb-2">ไม่พบรายชื่อในระบบ</h2>
+              <p class="text-gray-500 text-[13px] md:text-sm mb-5">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
+              
+              <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
+              
+              <p class="text-gray-600 text-[13px] font-medium mb-3">ช่องทางการติดต่อเจ้าหน้าที่</p>
+              <img src="https://img1.pic.in.th/images/81897.jpg" alt="QR Code ติดต่อเจ้าหน้าที่" class="mx-auto rounded-xl shadow-md w-36 h-36 object-contain bg-white p-2 border border-gray-100">
+            </div>
+          </div>
+          
+          <div id="result-error" class="hidden w-full animate-fade-in-up">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-sm mx-auto">
               <h2 class="text-xl font-bold text-gray-800 mb-2">ระบบขัดข้องชั่วคราว</h2>
               <p class="text-gray-500 text-sm mb-5">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
               <button id="btn-retry" class="btn-search px-6 py-2.5 rounded-xl text-sm font-semibold mx-auto">ลองใหม่</button>
@@ -293,21 +314,22 @@
           const list = document.getElementById('result-list');
           list.innerHTML = '';
           results.forEach((person, i) => {
-            const card = document.createElement('div');
-            // ป้ายชื่อจะเต็มความกว้าง w-full เสมอ เพื่อให้กว้างและเด่นที่สุด
-            card.className = 'w-full honor-card rounded-xl px-4 py-8 md:py-10 text-center animate-card-in';
-            card.style.animationDelay = `${i * 0.08}s`;
-            card.style.opacity = '0';
-            card.style.animationFillMode = 'forwards';
             
-            card.innerHTML = `
-              <div class="relative z-10 flex flex-col items-center justify-center">
-                <h3 class="text-3xl md:text-4xl font-bold text-gold-gradient tracking-wide">
+            // สร้างกรอบชื่อย่อย (Inner Name Box)
+            const nameBox = document.createElement('div');
+            nameBox.className = 'inner-name-box w-full px-4 py-6 md:py-8 text-center animate-fade-in';
+            nameBox.style.animationDelay = `${i * 0.1}s`;
+            nameBox.style.opacity = '0';
+            nameBox.style.animationFillMode = 'forwards';
+            
+            nameBox.innerHTML = `
+              <div class="relative z-10">
+                <h3 class="text-3xl md:text-4xl font-bold text-gold-gradient tracking-wide leading-tight">
                   ${escapeHtml(person.fullName)}
                 </h3>
               </div>
             `;
-            list.appendChild(card);
+            list.appendChild(nameBox);
           });
         } else {
           notFound.classList.remove('hidden');
