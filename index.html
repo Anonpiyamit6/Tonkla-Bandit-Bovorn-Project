@@ -137,7 +137,7 @@
               <i data-lucide="search" style="width:18px;height:18px;"></i> ค้นหารายชื่อ 
             </button>
           </form>
-          <p class="text-gray-400 text-xs mt-4">ข้อมูลเชื่อมต่อจากระบบฐานข้อมูลกลาง</p>
+          <p class="text-gray-400 text-xs mt-4">ข้อมูลเชื่อมต่อจากระบบฐานข้อมูลกลางแบบเรียลไทม์</p>
         </div>
       </div>
     </div>
@@ -160,7 +160,7 @@
           
           <div id="result-loading" class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto hidden animate-fade-in-up">
             <div class="flex justify-center mb-4"><div class="spinner"></div></div>
-            <p class="text-gray-600 font-medium">กำลังตรวจสอบข้อมูล...</p>
+            <p class="text-gray-600 font-medium">กำลังตรวจสอบข้อมูลล่าสุด...</p>
           </div>
           
           <!-- หน้าแสดงผลเมื่อค้นพบรายชื่อ -->
@@ -173,7 +173,7 @@
               <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-1">ท่านมีรายชื่อผู้เข้าร่วมโครงการ</h2>
               <h3 class="text-xl md:text-2xl font-bold text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</h3>
               
-              <!-- 2. พื้นที่แสดงกรอบชื่อ (Javascript จะนำ inner-name-box มาใส่ที่นี่) -->
+              <!-- 2. พื้นที่แสดงกรอบชื่อ -->
               <div id="result-list" class="w-full my-6"></div>
 
               <!-- 3. เส้นคั่นดอกบัว 🪷 -->
@@ -192,7 +192,7 @@
             </div>
           </div>
           
-          <!-- หน้าแสดงผลเมื่อไม่พบรายชื่อ (ปรับขนาดให้เล็กและบาลานซ์ขึ้น) -->
+          <!-- หน้าแสดงผลเมื่อไม่พบรายชื่อ -->
           <div id="result-not-found" class="hidden w-full animate-fade-in-up">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-sm mx-auto">
               <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-16 md:w-20 h-auto mx-auto mb-4 opacity-90" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
@@ -224,9 +224,6 @@
     lucide.createIcons();
 
     const SHEET_ID = '1TYAkb_ik3kns2dkVfoyOJCBYMacaJzzFW_V3A48QMzs';
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-
-    let cachedRecords = null;
 
     function normalizeString(str) {
       if (!str) return '';
@@ -234,11 +231,15 @@
     }
 
     async function fetchNames() {
-      if (cachedRecords) return cachedRecords;
-      const res = await fetch(SHEET_URL);
+      // เพิ่ม &timestamp เพื่อป้องกันเบราว์เซอร์จำข้อมูลเก่า (Cache Busting) 
+      // ทำให้ดึงข้อมูลสดใหม่แบบเรียลไทม์ทุกครั้ง
+      const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&_=${new Date().getTime()}`;
+      
+      const res = await fetch(sheetUrl, { cache: "no-store" });
       const text = await res.text();
       const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
       if (!jsonStr) throw new Error('Cannot parse JSON');
+      
       const data = JSON.parse(jsonStr[1]);
       const rows = data.table.rows;
       const records = [];
@@ -261,7 +262,6 @@
           records.push({ firstName: fName, lastName: lName, fullName: `${fName} ${lName}`.trim() });
         }
       }
-      cachedRecords = records;
       return records;
     }
 
@@ -293,6 +293,7 @@
       errorEl.classList.add('hidden');
 
       try {
+        // โหลดข้อมูลใหม่ 100% ทุกครั้งที่ผู้ใช้กดค้นหา
         const records = await fetchNames();
         const normSearchFname = normalizeString(lastFirstName);
         const normSearchLname = normalizeString(lastLastName);
@@ -396,7 +397,6 @@
     });
 
     showPage('search');
-    fetchNames().catch(e => console.log('Prefetch failed:', e));
   </script>
 </body>
 </html>
