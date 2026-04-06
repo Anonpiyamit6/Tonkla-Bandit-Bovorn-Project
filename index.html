@@ -129,20 +129,31 @@
 
   <!-- PAGE: RESULTS -->
   <div id="page-result" class="h-full w-full bg-cover-page relative hidden" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--2.png');">
-    <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-8 overflow-auto" style="min-height:100%;">
-      <!-- เปลี่ยนคอนเทนเนอร์ให้กว้างขึ้นเป็น max-w-xl เพื่อให้มีพื้นที่สำหรับชื่อที่ยาวขึ้น -->
-      <div class="w-full max-w-xl">
-        <button id="btn-back" class="glass-card rounded-full px-4 py-2 text-sm font-medium text-gray-700 flex items-center gap-1.5 mb-6 hover:bg-white/90 transition-all animate-fade-in cursor-pointer max-w-fit"> 
-          <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> กลับหน้าค้นหา 
-        </button>
-        <div id="result-container" class="animate-fade-in-up">
+    <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-6 md:py-8 overflow-auto" style="min-height:100%;">
+      
+      <div class="w-full max-w-xl flex flex-col items-center">
+        
+        <!-- แถบด้านบน: ปุ่มกลับ -->
+        <div class="w-full flex justify-start mb-4">
+          <button id="btn-back" class="glass-card rounded-full px-4 py-2 text-sm font-medium text-gray-700 flex items-center gap-1.5 hover:bg-white/90 transition-all animate-fade-in cursor-pointer"> 
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> กลับหน้าค้นหา 
+          </button>
+        </div>
+
+        <!-- โลโก้ในหน้าแสดงผล (ลดขนาดลงเล็กน้อยเพื่อให้ชื่อเด่นกว่า) -->
+        <div class="mb-6 animate-float">
+          <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-36 md:w-44 h-auto mx-auto" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));">
+        </div>
+        
+        <!-- คอนเทนเนอร์หลักของผลลัพธ์ -->
+        <div id="result-container" class="animate-fade-in-up w-full">
           
           <div id="result-loading" class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto hidden">
             <div class="flex justify-center mb-4"><div class="spinner"></div></div>
             <p class="text-gray-600 font-medium">กำลังตรวจสอบข้อมูล...</p>
           </div>
           
-          <div id="result-found" class="hidden">
+          <div id="result-found" class="hidden w-full">
             <!-- กรอบหัวข้อ (บีบความกว้างให้เล็กกว่าชื่อ) -->
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-6 max-w-[85%] md:max-w-md mx-auto">
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</span></h2>
@@ -163,7 +174,7 @@
             </div>
           </div>
           
-          <div id="result-not-found" class="hidden">
+          <div id="result-not-found" class="hidden w-full">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">ไม่พบรายชื่อในระบบ</h2>
               <p class="text-gray-500 text-sm mb-6">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
@@ -173,7 +184,7 @@
             </div>
           </div>
           
-          <div id="result-error" class="hidden">
+          <div id="result-error" class="hidden w-full">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
               <h2 class="text-xl font-bold text-gray-800 mb-2">ระบบขัดข้องชั่วคราว</h2>
               <p class="text-gray-500 text-sm mb-5">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
@@ -281,7 +292,7 @@
           list.innerHTML = '';
           results.forEach((person, i) => {
             const card = document.createElement('div');
-            // ป้ายชื่อจะเต็มความกว้าง w-full เสมอ
+            // ป้ายชื่อจะเต็มความกว้าง w-full เสมอ เพื่อให้กว้างและเด่นที่สุด
             card.className = 'w-full honor-card rounded-xl px-4 py-8 md:py-10 text-center animate-card-in';
             card.style.animationDelay = `${i * 0.08}s`;
             card.style.opacity = '0';
