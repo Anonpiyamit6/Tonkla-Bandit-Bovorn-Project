@@ -24,10 +24,11 @@
     .animate-float { animation: float 3.5s ease-in-out infinite; }
 
     .glass-card {
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(212,175,55,0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
 
     .gold-glow { animation: pulse-gold 2.5s ease-in-out infinite; }
@@ -75,7 +76,7 @@
     .btn-search:hover { background: linear-gradient(135deg, #e0bc42, #d4af37); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
     .btn-search:active { transform: translateY(0); }
 
-    .overlay-dark { background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.35) 100%); }
+    .overlay-dark { background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%); }
     .spinner { border: 3px solid rgba(212,175,55,0.2); border-top-color: #d4af37; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -131,7 +132,7 @@
   <div id="page-result" class="h-full w-full bg-cover-page relative hidden" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--2.png');">
     <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-6 md:py-8 overflow-auto" style="min-height:100%;">
       
-      <div class="w-full max-w-xl flex flex-col items-center">
+      <div class="w-full max-w-xl flex flex-col items-center pt-2">
         
         <!-- แถบด้านบน: ปุ่มกลับ -->
         <div class="w-full flex justify-start mb-4">
@@ -140,11 +141,6 @@
           </button>
         </div>
 
-        <!-- โลโก้ในหน้าแสดงผล (ลดขนาดลงเล็กน้อยเพื่อให้ชื่อเด่นกว่า) -->
-        <div class="mb-6 animate-float">
-          <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-36 md:w-44 h-auto mx-auto" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));">
-        </div>
-        
         <!-- คอนเทนเนอร์หลักของผลลัพธ์ -->
         <div id="result-container" class="animate-fade-in-up w-full">
           
@@ -154,38 +150,44 @@
           </div>
           
           <div id="result-found" class="hidden w-full">
-            <!-- กรอบหัวข้อ (บีบความกว้างให้เล็กกว่าชื่อ) -->
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-6 max-w-[85%] md:max-w-md mx-auto">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</span></h2>
-              <div class="lotus-divider mt-5"><span class="text-lg">🪷</span></div>
+            <!-- 1. กรอบหัวข้อ + โลโก้ (บีบความกว้างให้เล็กกว่าชื่อ) -->
+            <div class="glass-card rounded-2xl p-5 md:p-6 text-center mb-3.5 max-w-[85%] md:max-w-sm mx-auto">
+              <!-- โลโก้ถูกย้ายมาอยู่ในกรอบ ปรับขนาดให้กะทัดรัด -->
+              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-20 md:w-24 h-auto mx-auto mb-3 animate-float" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+              
+              <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-1 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ</h2>
+              <h3 class="text-xl md:text-2xl font-bold text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</h3>
             </div>
             
-            <!-- กรอบแสดงชื่อ (ปล่อยเต็มความกว้าง กว้างที่สุดในหน้าจอ) -->
-            <div id="result-list" class="flex flex-col gap-4 mb-6 w-full"></div>
+            <!-- 2. กรอบแสดงชื่อ (ปล่อยเต็มความกว้าง กว้างที่สุดในหน้าจอ) -->
+            <div id="result-list" class="flex flex-col gap-4 mb-3.5 w-full"></div>
 
-            <!-- กรอบข้อความแยกต่างหาก (บีบความกว้างให้เล็กกว่าชื่อ) -->
-            <div class="glass-card rounded-xl p-5 md:p-6 text-center animate-fade-in-up max-w-[85%] md:max-w-md mx-auto" style="animation-delay: 0.3s; animation-fill-mode: both; background: rgba(255,255,255,0.85);">
-              <p class="text-gray-700 font-medium text-[15px] md:text-base leading-relaxed">
+            <!-- 3. กรอบข้อความแยกต่างหาก (บีบความกว้าง ขยับขึ้นมาชิดกับกรอบชื่อ) -->
+            <div class="glass-card rounded-xl p-4 md:p-5 text-center animate-fade-in-up max-w-[85%] md:max-w-sm mx-auto" style="animation-delay: 0.3s; animation-fill-mode: both;">
+              <p class="text-gray-700 font-medium text-[14px] md:text-[15px] leading-relaxed">
                 จากราก…สู่ลำต้น จากลำต้น…สู่ดอกบาน
               </p>
-              <p class="text-yellow-700 font-semibold text-[15px] md:text-base leading-relaxed mt-1">
+              <p class="text-yellow-700 font-semibold text-[14px] md:text-[15px] leading-relaxed mt-0.5">
                 ท่านคือส่วนหนึ่งของทุกการเติบโตของราชพฤกษ์นี้
               </p>
             </div>
           </div>
           
           <div id="result-not-found" class="hidden w-full">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-md mx-auto">
+              <!-- เพิ่มโลโก้ในหน้า ไม่พบรายชื่อ เพื่อความสมดุล -->
+              <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-20 md:w-24 h-auto mx-auto mb-4 opacity-90" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));">
+              
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">ไม่พบรายชื่อในระบบ</h2>
-              <p class="text-gray-500 text-sm mb-6">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
-              <div class="lotus-divider mb-6"><span class="text-lg">🪷</span></div>
+              <p class="text-gray-500 text-sm mb-5">กรุณาตรวจสอบการสะกดคำอีกครั้ง<br>หรือติดต่อเจ้าหน้าที่หากมีข้อสงสัย</p>
+              <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
               <p class="text-gray-600 text-sm font-medium mb-3">ช่องทางการติดต่อเจ้าหน้าที่</p>
-              <img src="https://img1.pic.in.th/images/81897.jpg" alt="QR Code ติดต่อเจ้าหน้าที่" class="mx-auto rounded-xl shadow-md w-48 h-48 object-contain bg-white p-2 border border-gray-100">
+              <img src="https://img1.pic.in.th/images/81897.jpg" alt="QR Code ติดต่อเจ้าหน้าที่" class="mx-auto rounded-xl shadow-md w-40 h-40 object-contain bg-white p-2 border border-gray-100">
             </div>
           </div>
           
           <div id="result-error" class="hidden w-full">
-            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-md mx-auto">
+            <div class="glass-card rounded-2xl p-6 md:p-8 text-center max-w-[90%] md:max-w-md mx-auto">
               <h2 class="text-xl font-bold text-gray-800 mb-2">ระบบขัดข้องชั่วคราว</h2>
               <p class="text-gray-500 text-sm mb-5">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
               <button id="btn-retry" class="btn-search px-6 py-2.5 rounded-xl text-sm font-semibold mx-auto">ลองใหม่</button>
