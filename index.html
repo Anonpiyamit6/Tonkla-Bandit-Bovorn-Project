@@ -73,7 +73,6 @@
           <p class="text-gray-700 text-sm mb-4 font-medium">กรุณากรอกชื่อ และ นามสกุล เพื่อตรวจสอบ</p>
           <form id="search-form" class="flex flex-col gap-4">
             
-            <!-- แยกช่องกรอก ชื่อ และ นามสกุล -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div class="relative">
                 <input id="search-firstname" type="text" placeholder="ชื่อ" class="search-input w-full px-4 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/90 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off" required>
@@ -114,7 +113,6 @@
               <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600">"ต้นกล้าบัณฑิตบวร"</span></h2>
               <div class="lotus-divider mt-5"><span class="text-lg">🪷</span></div>
             </div>
-            <!-- รายชื่อจะแสดงตรงนี้แบบไม่มีตัวเลข และตัวใหญ่ขึ้น -->
             <div id="result-list" class="flex flex-col gap-3"></div>
           </div>
           
@@ -149,10 +147,10 @@
     const SHEET_ID = '1TYAkb_ik3kns2dkVfoyOJCBYMacaJzzFW_V3A48QMzs';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    let cachedNames = null;
+    let cachedRecords = null;
 
     async function fetchNames() {
-      if (cachedNames) return cachedNames;
+      if (cachedRecords) return cachedRecords;
       
       const res = await fetch(SHEET_URL);
       const text = await res.text();
@@ -163,11 +161,12 @@
       const data = JSON.parse(jsonStr[1]);
       const rows = data.table.rows;
       
-      const names = [];
-      let targetColIdx = -1;
+      const records = [];
+      let fNameColIdx = -1;
+      let lNameColIdx = -1;
       let startRowIdx = -1;
 
-      // หาหัวตาราง "ชื่อ-สกุล"
+      // สแกนหาคอลัมน์ "ชื่อ" และ "สกุล"
       for (let r = 0; r < rows.length; r++) {
         const rowData = rows[r].c;
         if (!rowData) continue;
@@ -175,32 +174,51 @@
           const cell = rowData[c];
           if (cell && cell.v && typeof cell.v === 'string') {
             const cellText = cell.v.trim();
-            if (cellText === 'ชื่อ-สกุล' || cellText.includes('ชื่อ-สกุล')) {
-              targetColIdx = c;
-              startRowIdx = r + 1;
-              break;
+            if (cellText === 'ชื่อ') {
+              fNameColIdx = c;
+            } else if (cellText === 'สกุล' || cellText === 'นามสกุล') {
+              lNameColIdx = c;
             }
           }
         }
-        if (targetColIdx !== -1) break;
+        // ถ้าเจอช่องใดช่องหนึ่ง ให้ถือว่าแถวถัดไปคือข้อมูล
+        if (fNameColIdx !== -1 || lNameColIdx !== -1) {
+          startRowIdx = r + 1;
+          break;
+        }
       }
 
-      if (targetColIdx === -1) { targetColIdx = 2; startRowIdx = 3; }
+      // ค่าเริ่มต้น หากหาหัวตารางไม่เจอ ให้ถือว่า ชื่ออยู่ช่อง C(2) และ สกุลอยู่ช่อง D(3)
+      if (fNameColIdx === -1) fNameColIdx = 2; 
+      if (lNameColIdx === -1) lNameColIdx = 3; 
+      if (startRowIdx === -1) startRowIdx = 3; // ข้อมูลเริ่มที่แถว 4
 
+      // ดึงข้อมูลชื่อและนามสกุลมาเก็บเป็น Object
       for (let r = startRowIdx; r < rows.length; r++) {
         const rowData = rows[r].c;
-        if (rowData && rowData[targetColIdx]) {
-          const val = rowData[targetColIdx].v;
-          if (val && typeof val === 'string') {
-            const trimmedName = val.trim();
-            if (trimmedName !== '') {
-              names.push(trimmedName);
-            }
-          }
+        if (!rowData) continue;
+
+        let fName = '';
+        let lName = '';
+
+        if (rowData[fNameColIdx] && typeof rowData[fNameColIdx].v === 'string') {
+          fName = rowData[fNameColIdx].v.trim();
+        }
+        if (rowData[lNameColIdx] && typeof rowData[lNameColIdx].v === 'string') {
+          lName = rowData[lNameColIdx].v.trim();
+        }
+
+        // ถ้ามีชื่อหรือนามสกุลอย่างใดอย่างหนึ่ง ให้เก็บลงระบบ
+        if (fName !== '' || lName !== '') {
+          records.push({
+            firstName: fName,
+            lastName: lName,
+            fullName: `${fName} ${lName}`.trim()
+          });
         }
       }
-      cachedNames = names;
-      return names;
+      cachedRecords = records;
+      return records;
     }
 
     const pageSearch = document.getElementById('page-search');
@@ -233,13 +251,16 @@
       errorEl.classList.add('hidden');
 
       try {
-        const names = await fetchNames();
+        const records = await fetchNames();
         
-        // กรองข้อมูลโดยต้องตรงกับทั้งชื่อ และ นามสกุล (ถ้ามีการกรอกนามสกุล)
-        const results = names.filter(n => {
-          const fullName = n.toLowerCase();
-          const matchFirst = lastFirstName === '' || fullName.includes(lastFirstName);
-          const matchLast = lastLastName === '' || fullName.includes(lastLastName);
+        // ค้นหาโดยแยกเงื่อนไข ชื่อ ค้นในคอลัมน์ชื่อ, สกุล ค้นในคอลัมน์สกุล
+        const results = records.filter(person => {
+          const pFName = person.firstName.toLowerCase();
+          const pLName = person.lastName.toLowerCase();
+          
+          const matchFirst = lastFirstName === '' || pFName.includes(lastFirstName);
+          const matchLast = lastLastName === '' || pLName.includes(lastLastName);
+          
           return matchFirst && matchLast;
         });
 
@@ -250,16 +271,14 @@
 
           const list = document.getElementById('result-list');
           list.innerHTML = '';
-          results.forEach((name, i) => {
+          results.forEach((person, i) => {
             const card = document.createElement('div');
-            // ออกแบบป้ายชื่อใหม่ ใหญ่ขึ้น อยู่ตรงกลาง
             card.className = 'nameplate-card rounded-xl px-4 py-5 md:py-6 text-center animate-card-in';
             card.style.animationDelay = `${i * 0.08}s`;
             card.style.opacity = '0';
             card.style.animationFillMode = 'forwards';
             
-            // แสดงเฉพาะชื่อ ตัวใหญ่และหนา
-            card.innerHTML = `<span class="text-gray-800 font-bold text-xl md:text-2xl tracking-wide">${escapeHtml(name)}</span>`;
+            card.innerHTML = `<span class="text-gray-800 font-bold text-xl md:text-2xl tracking-wide">${escapeHtml(person.fullName)}</span>`;
             list.appendChild(card);
           });
         } else {
@@ -291,7 +310,6 @@
       doSearch(lastFirstName, lastLastName);
     });
 
-    // โหลดข้อมูลพื้นหลังล่วงหน้า
     showPage('search');
     fetchNames().catch(e => console.log('Prefetch failed:', e));
   </script>
