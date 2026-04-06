@@ -143,8 +143,20 @@
           
           <div id="result-found" class="hidden">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center mb-4">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600">"ต้นกล้าบัณฑิตบวร"</span></h2>
-              <div class="lotus-divider mt-5"><span class="text-lg">🪷</span></div>
+              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug">ท่านมีรายชื่อผู้เข้าร่วมโครงการ<br><span class="text-yellow-600 drop-shadow-sm">"ต้นกล้าบัณฑิตบวร"</span></h2>
+              
+              <div class="lotus-divider my-4"><span class="text-lg">🪷</span></div>
+              
+              <!-- ข้อความเชิดชูความหมายดีๆ ที่เพิ่มเข้ามาใหม่ -->
+              <div class="py-1">
+                <p class="text-gray-700 font-medium text-[15px] md:text-base leading-relaxed">
+                  จากราก…สู่ลำต้น จากลำต้น…สู่ดอกบาน
+                </p>
+                <p class="text-yellow-700 font-semibold text-[15px] md:text-base leading-relaxed mt-1">
+                  ท่านคือส่วนหนึ่งของทุกการเติบโตของราชพฤกษ์นี้
+                </p>
+              </div>
+              
             </div>
             <div id="result-list" class="flex flex-col gap-4"></div>
           </div>
@@ -267,13 +279,11 @@
           list.innerHTML = '';
           results.forEach((person, i) => {
             const card = document.createElement('div');
-            // เปลี่ยน Class ที่ใช้แสดงผลชื่อให้สวยงาม (Honor Card)
             card.className = 'honor-card rounded-xl px-4 py-6 md:py-8 text-center animate-card-in';
             card.style.animationDelay = `${i * 0.08}s`;
             card.style.opacity = '0';
             card.style.animationFillMode = 'forwards';
             
-            // ใช้ text-gold-gradient ให้ชื่อดูมีมิติ
             card.innerHTML = `
               <div class="relative z-10">
                 <h3 class="text-2xl md:text-3xl font-bold text-gold-gradient tracking-wide">
@@ -339,7 +349,6 @@
 
     document.getElementById('btn-back').addEventListener('click', () => {
       showPage('search');
-      // ล้างค่าเพื่อให้ค้นหาคนต่อไปได้ง่าย (ถ้าต้องการลบออกได้)
       document.getElementById('search-firstname').value = '';
       document.getElementById('search-lastname').value = '';
     });
