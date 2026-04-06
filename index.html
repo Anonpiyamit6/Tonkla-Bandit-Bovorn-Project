@@ -13,7 +13,6 @@
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
     @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.3); } 50% { box-shadow: 0 0 40px rgba(212,175,55,0.6); } }
     @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
@@ -54,22 +53,21 @@
     <div class="overlay-dark h-full w-full flex items-center justify-center p-4">
       <div class="w-full max-w-lg text-center animate-fade-in-up">
         
-        <!-- เปลี่ยนโลโก้ตรงนี้ -->
         <div class="mb-4 animate-float">
           <img src="https://img1.pic.in.th/images/-262a3812a99a025145.png" alt="โลโก้โครงการ" class="w-32 md:w-40 h-auto mx-auto drop-shadow-xl" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
         </div>
         
-        <h1 id="el-main-title" class="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-lg" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        <h1 class="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-lg" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
           รายชื่อผู้เข้าร่วมโครงการ<br>ต้นกล้าบัณฑิตบวร
         </h1>
-        <p id="el-sub-title" class="text-sm md:text-base text-yellow-100 mb-8 font-light drop-shadow" style="text-shadow: 0 1px 6px rgba(0,0,0,0.4);">
+        <p class="text-sm md:text-base text-yellow-100 mb-8 font-light drop-shadow" style="text-shadow: 0 1px 6px rgba(0,0,0,0.4);">
           ทอดผ้าป่าเพื่อสนับสนุนการศึกษาให้กับโรงเรียนบางสะพานวิทยา
         </p>
         <div class="glass-card rounded-2xl p-6 md:p-8 gold-glow">
           <p class="text-gray-700 text-sm mb-4 font-medium">กรุณาพิมพ์ชื่อ หรือ นามสกุล เพื่อตรวจสอบ</p>
           <form id="search-form" class="flex flex-col gap-3">
             <div class="relative">
-              <input id="search-input" type="text" placeholder="พิมพ์ชื่อ หรือ นามสกุล..." class="search-input w-full px-5 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/80 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off">
+              <input id="search-input" type="text" placeholder="พิมพ์ชื่อ หรือ นามสกุล..." class="search-input w-full px-5 py-3.5 rounded-xl border-2 border-yellow-200 bg-white/80 text-gray-800 text-base placeholder-gray-400 transition-all" autocomplete="off" required>
               <div class="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-500">
                 <i data-lucide="search" style="width:20px;height:20px;"></i>
               </div>
@@ -84,7 +82,7 @@
     </div>
   </div>
 
-  <!-- PAGE: RESULTS (เปลี่ยนรูปพื้นหลังเป็นรูปเดียวกัน) -->
+  <!-- PAGE: RESULTS -->
   <div id="page-result" class="h-full w-full bg-cover-page relative hidden" style="background-image: url('https://img2.pic.in.th/--CoverPageFacebook_--2.png');">
     <div class="overlay-dark min-h-full w-full flex items-start justify-center p-4 py-8 overflow-auto" style="min-height:100%;">
       <div class="w-full max-w-lg">
@@ -96,7 +94,7 @@
           <!-- Loading -->
           <div id="result-loading" class="glass-card rounded-2xl p-10 text-center hidden">
             <div class="flex justify-center mb-4"><div class="spinner"></div></div>
-            <p class="text-gray-600 font-medium">กำลังค้นหาข้อมูล...</p>
+            <p class="text-gray-600 font-medium">กำลังเชื่อมต่อฐานข้อมูล...</p>
           </div>
           
           <!-- Found -->
@@ -112,7 +110,7 @@
           <!-- Not found -->
           <div id="result-not-found" class="hidden">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center"><span class="text-4xl mb-3 inline-block">🙏</span>
-              <h2 id="el-not-found-msg" class="text-xl font-bold text-gray-800 mb-2">ไม่พบข้อมูลผู้บริจาค</h2>
+              <h2 class="text-xl font-bold text-gray-800 mb-2">ไม่พบข้อมูลผู้บริจาค</h2>
               <p class="text-gray-500 text-sm mb-5">หากไม่พบชื่อ กรุณาติดต่อเจ้าหน้าที่</p>
               <div class="lotus-divider mb-5"><span class="text-lg">🪷</span></div>
               <p class="text-gray-600 text-sm font-medium mb-3">สแกน QR Code เพื่อติดต่อ</p>
@@ -124,7 +122,7 @@
           <div id="result-error" class="hidden">
             <div class="glass-card rounded-2xl p-6 md:p-8 text-center"><span class="text-4xl mb-3 inline-block">⚠️</span>
               <h2 class="text-xl font-bold text-gray-800 mb-2">เกิดข้อผิดพลาด</h2>
-              <p class="text-gray-500 text-sm mb-4">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
+              <p class="text-gray-500 text-sm mb-4">ไม่สามารถดึงข้อมูลได้ (โปรดตรวจสอบการแชร์ไฟล์ Google Sheet ให้เป็นสาธารณะ)</p>
               <button id="btn-retry" class="btn-search px-6 py-2.5 rounded-xl text-sm font-semibold">ลองใหม่</button>
             </div>
           </div>
@@ -135,10 +133,8 @@
   </div>
 
   <script>
-    // Initialize Icons
     lucide.createIcons();
 
-    // Google Sheets data fetch
     const SHEET_ID = '1TYAkb_ik3kns2dkVfoyOJCBYMacaJzzFW_V3A48QMzs';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
@@ -146,41 +142,64 @@
 
     async function fetchNames() {
       if (cachedNames) return cachedNames;
+      
       const res = await fetch(SHEET_URL);
       const text = await res.text();
+      
       const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
-      if (!jsonStr) throw new Error('Parse error');
+      if (!jsonStr) throw new Error('ไม่สามารถอ่านข้อมูล JSON จาก Google Sheet ได้');
+      
       const data = JSON.parse(jsonStr[1]);
       const rows = data.table.rows;
-      const cols = data.table.cols;
-
-      let nameColIdx = -1;
-      for (let i = 0; i < cols.length; i++) {
-        if (cols[i].label && cols[i].label.includes('ชื่อ-สกุล')) { nameColIdx = i; break; }
-      }
-      if (nameColIdx === -1 && rows.length > 0) {
-        for (let i = 0; i < (rows[0].c || []).length; i++) {
-          const cell = rows[0].c[i];
-          if (cell && cell.v && String(cell.v).includes('ชื่อ-สกุล')) { nameColIdx = i; break; }
-        }
-      }
-      if (nameColIdx === -1) nameColIdx = 0;
-
+      
       const names = [];
-      for (const row of rows) {
-        if (row.c && row.c[nameColIdx]) {
-          const val = row.c[nameColIdx].v;
+      let targetColIdx = -1;
+      let startRowIdx = -1;
+
+      // 1. ค้นหาหาช่องที่มีคำว่า "ชื่อ-สกุล" (ช่อง C3 หรือช่องใดๆ)
+      for (let r = 0; r < rows.length; r++) {
+        const rowData = rows[r].c;
+        if (!rowData) continue;
+        
+        for (let c = 0; c < rowData.length; c++) {
+          const cell = rowData[c];
+          if (cell && cell.v && typeof cell.v === 'string') {
+            // ตัดช่องว่างซ้ายขวาออกก่อนตรวจสอบ
+            const cellText = cell.v.trim();
+            if (cellText === 'ชื่อ-สกุล' || cellText.includes('ชื่อ-สกุล')) {
+              targetColIdx = c;
+              startRowIdx = r + 1; // ข้อมูลรายชื่อจะเริ่มที่บรรทัดถัดไป
+              break;
+            }
+          }
+        }
+        if (targetColIdx !== -1) break; // ถ้าเจอแล้วให้หยุดค้นหาหัวตาราง
+      }
+
+      // ถ้าไม่เจอคำว่า "ชื่อ-สกุล" ให้บังคับใช้ Column C (index 2) และเริ่มดึงข้อมูลตั้งแต่แถวที่ 4 (index 3) เป็นค่าเริ่มต้น
+      if (targetColIdx === -1) {
+        targetColIdx = 2; 
+        startRowIdx = 3; 
+      }
+
+      // 2. ดึงเฉพาะรายชื่อที่อยู่ใต้คอลัมน์ที่เจอ
+      for (let r = startRowIdx; r < rows.length; r++) {
+        const rowData = rows[r].c;
+        if (rowData && rowData[targetColIdx]) {
+          const val = rowData[targetColIdx].v;
           if (val && typeof val === 'string') {
-            const trimmed = val.trim();
-            if (trimmed && !trimmed.includes('ชื่อ-สกุล')) { names.push(trimmed); }
+            const trimmedName = val.trim();
+            if (trimmedName !== '') {
+              names.push(trimmedName);
+            }
           }
         }
       }
+
       cachedNames = names;
       return names;
     }
 
-    // Navigation
     const pageSearch = document.getElementById('page-search');
     const pageResult = document.getElementById('page-result');
 
@@ -189,7 +208,6 @@
       pageResult.classList.toggle('hidden', page !== 'result');
     }
 
-    // Search
     let lastQuery = '';
 
     async function doSearch(query) {
@@ -210,7 +228,13 @@
 
       try {
         const names = await fetchNames();
-        const results = names.filter(n => n.toLowerCase().includes(lastQuery.toLowerCase()));
+        
+        // กรองหาเฉพาะชื่อที่มีคำที่ค้นหาอยู่ (รองรับตัวพิมพ์เล็ก/ใหญ่ และเว้นวรรค)
+        const searchTerms = lastQuery.toLowerCase().split(' ').filter(t => t);
+        const results = names.filter(n => {
+          const nameLower = n.toLowerCase();
+          return searchTerms.every(term => nameLower.includes(term));
+        });
 
         loading.classList.add('hidden');
 
@@ -236,7 +260,7 @@
           notFound.classList.remove('hidden');
         }
       } catch (e) {
-        console.error('Fetch error:', e);
+        console.error('Error fetching data:', e);
         loading.classList.add('hidden');
         errorEl.classList.remove('hidden');
       }
@@ -246,7 +270,6 @@
       const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
     }
 
-    // Events
     document.getElementById('search-form').addEventListener('submit', (e) => {
       e.preventDefault();
       doSearch(document.getElementById('search-input').value);
@@ -254,15 +277,16 @@
 
     document.getElementById('btn-back').addEventListener('click', () => {
       showPage('search');
+      document.getElementById('search-input').value = ''; // ล้างช่องค้นหาเมื่อกดกลับ
     });
 
     document.getElementById('btn-retry').addEventListener('click', () => {
       if (lastQuery) doSearch(lastQuery);
     });
 
-    // Init
+    // เริ่มการดึงข้อมูลพื้นหลังล่วงหน้า เพื่อให้ตอนค้นหาเร็วขึ้น
     showPage('search');
-    fetchNames().catch(() => {});
+    fetchNames().catch(e => console.log('Prefetch failed:', e));
   </script>
 </body>
 </html>
